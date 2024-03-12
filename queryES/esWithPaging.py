@@ -83,6 +83,6 @@ if __name__ == "__main__":
         es_port=9200,
         es_index="logstash-hive-1",
         es_user="elastic",
-        es_password="NotMonday@1",
+        es_password="elastic",
     )
-    esq_obj.relativeTimeQuery("24h")
+    esq_obj.relativeTimeQuery("1h")
