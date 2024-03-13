@@ -35,7 +35,7 @@ if __name__ == "__main__":
         es_user=lookout_config['elasticsearch_username'],
         es_password=lookout_config['elasticsearch_password'],
     )
-    tpot_query_data=es_query_obj.relativeTimeQuery("1h")
+    tpot_query_data=es_query_obj.relativeTimeQuery("24h")
 
     # [2] consolidate by IP
     consolidate_obj=consolidate_data.consolidateTpotData(lookout_config, tpot_query_data)
@@ -43,8 +43,8 @@ if __name__ == "__main__":
     print (f' -- Number of unique entries to submit to OTX: {len(reducedDataList)}')
 
     # [3] submit to otx
-    submit_alienvault_obj=submit_alienvault_otx.alienvaultOTX(lookout_config, reducedDataList)
-    submit_alienvault_obj.processConsolidatedData()
+    #submit_alienvault_obj=submit_alienvault_otx.alienvaultOTX(lookout_config, reducedDataList)
+    #submit_alienvault_obj.processConsolidatedData()
 
 
     #alienvault_obj = submit_alienvault_otx.alienvaultOTX(lookout_config)
