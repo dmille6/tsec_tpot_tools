@@ -26,7 +26,6 @@ class consolidateTpotData:
         print (f' -- Consolidate Object Created:')
         self.lookout_config = lookout_config
         self.dataList= queryData
-        #self.reduceQueryData()
 
     # This is UGLY.. there has to be a better way.. but it reduces/consolidates the data from es query. it creates a
     # dictionary with the malicious ip as the dictionary key..
@@ -35,7 +34,8 @@ class consolidateTpotData:
         # print ("packing data.. please wait..")
         consolidatedData = {}
 
-        for item in self.dataList:
+        print (f' -- Reducing Elasticsearch Query Data.. please wait..')
+        for item in tqdm(self.dataList):
             if "src_ip" in item.keys():
                 if "type" in item.keys():
                     if (

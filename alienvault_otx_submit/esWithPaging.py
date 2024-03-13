@@ -58,12 +58,14 @@ class queryElasticsearch:
         scroll_id = response["_scroll_id"]
         total_hits = response["hits"]["total"]["value"]
         print(f" -- Total Hits: {total_hits}")
+        pbar = tqdm(total=total_hits)
 
         print(" [+]: querying ES, please wait...")
         # Process the initial batch of documents
         count = 0
         for hit in response["hits"]["hits"]:
             self.q_results.append(hit["_source"])
+            pbar.update(1)
 
         # Begin scrolling through the rest of the results
         while len(response["hits"]["hits"]) > 0:
@@ -73,6 +75,8 @@ class queryElasticsearch:
             # Process the next batch of documents
             for hit in response["hits"]["hits"]:
                 self.q_results.append(hit["_source"])
+                pbar.update(1)
+        pbar.close()
 
         print(f" -- Total Hits Added to List: {len(self.q_results)}")
         return self.q_results.copy()

@@ -35,7 +35,7 @@ if __name__ == "__main__":
         es_user=lookout_config['elasticsearch_username'],
         es_password=lookout_config['elasticsearch_password'],
     )
-    tpot_query_data=es_query_obj.relativeTimeQuery("5m")
+    tpot_query_data=es_query_obj.relativeTimeQuery("1h")
 
     # [2] consolidate by IP
     consolidate_obj=consolidate_data.consolidateTpotData(lookout_config, tpot_query_data)

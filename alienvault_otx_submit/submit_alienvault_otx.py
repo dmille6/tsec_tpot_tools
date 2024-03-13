@@ -8,6 +8,7 @@ from typing import Type
 
 from OTXv2 import OTXv2  #Alienvault library
 import socket
+from tqdm import tqdm
 
 class alienvaultOTX:
     logData={}
@@ -21,7 +22,6 @@ class alienvaultOTX:
     def processConsolidatedData(self):
         #puts the logs in otx json format
         results=self.processLogs(self.consolidatedData)
-        print (results)
         self.SubmitOTX_Pulse(results,"HoneyNet")
 
     def processLogs(self, LogData):
@@ -78,8 +78,9 @@ class alienvaultOTX:
         PulseReference=""
 
         OTX_KeyList=[self.lookout_config['OTX_Key_dm_lacia'] ]
+        print (f'Building OTX package please wait.. ')
         #OTX_KeyList = [self.lookout_config['OTX_Key_dm_lacia']]
-        for otxItem in OTX_KeyList:
+        for otxItem in tqdm(OTX_KeyList):
             otx = OTXv2(otxItem)
             for pulseItem in PulseNamesList:
                 PulseID=self.checkForOTXPulse(pulseItem, otx)
