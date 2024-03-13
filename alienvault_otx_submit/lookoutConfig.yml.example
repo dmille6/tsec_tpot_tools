@@ -1,7 +1,7 @@
 elasticsearch_host: "http://10.0.0.25" #probably not yours
 elasticsearch_port: 9200
 elasticsearch_index: logstash-* #probably change this
-elasticsearch_username: elastic #change this
-elasticsearch_password: elastic #change this
-OTX_Key_dm_lacia: '<OTX API Key>'
+elasticsearch_username: mike #change this
+elasticsearch_password: NotMonday@1 #change this
+OTX_Key_dm_lacia: '6abf432db799ef88cbb9673d72efbee2477efb81c9887b92041539d41e27d495'
 whitelist_ips: ["8.8.8.8","8.8.4.4","0.0.0.0","1.1.1.1"] #also add CCU ips and probably honeypot ips
