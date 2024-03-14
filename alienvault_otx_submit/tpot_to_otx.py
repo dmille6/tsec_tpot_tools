@@ -120,11 +120,15 @@ class queryElasticsearch:
         return self.get_consolidated_data()
 
     def addDataToConsolidatedData(self, item):
-        #TODO: there has to be a better way than 5+ nested if's
-        if "src_ip" in item.keys(): # if there is a source IP address
-            if "type" in item.keys(): # if there is a honeypot type listed
-                if item["type"] not in self.config["blacklist_tpot_types"]: # skips honeypot types listed in blacklist in config
-                    if item["src_ip"] not in self.config["whitelist_ips"]:  # if not honeypot ip
+        # TODO: there has to be a better way than 5+ nested if's
+        if "src_ip" in item.keys():  # if there is a source IP address
+            if "type" in item.keys():  # if there is a honeypot type listed
+                if (
+                    item["type"] not in self.config["blacklist_tpot_types"]
+                ):  # skips honeypot types listed in blacklist in config
+                    if (
+                        item["src_ip"] not in self.config["whitelist_ips"]
+                    ):  # if not honeypot ip
                         if (
                             item["src_ip"] in self.consolidatedData.keys()
                         ):  # if IP Already in list
@@ -139,7 +143,9 @@ class queryElasticsearch:
                             if "src_port" in item.keys():
                                 if (
                                     item["src_port"]
-                                    not in self.consolidatedData[item["src_ip"]]["src_port"]
+                                    not in self.consolidatedData[item["src_ip"]][
+                                        "src_port"
+                                    ]
                                 ):
                                     self.consolidatedData[item["src_ip"]][
                                         "src_port"
@@ -157,9 +163,13 @@ class queryElasticsearch:
                             portCount = len(
                                 self.consolidatedData[item["src_ip"]]["src_port"]
                             ) + len(self.consolidatedData[item["src_ip"]]["dest_port"])
-                            if portCount > 20: # if more than 20 ports in list, just say port scan
+                            if (
+                                portCount > 20
+                            ):  # if more than 20 ports in list, just say port scan
                                 portDescription = (
-                                    "Port Scan:" + str(portCount) + " ports were scanned"
+                                    "Port Scan:"
+                                    + str(portCount)
+                                    + " ports were scanned"
                                 )
                             else:
                                 count = self.consolidatedData[item["src_ip"]]["count"]
@@ -209,6 +219,7 @@ class queryElasticsearch:
 # usage: alienvaultOTX( conofiguration_dictionary, consolidated data dictionary)
 # description: submits consolidated data from tsec tpot to alienvault otx open source threat community
 
+
 # sub-methods:
 #    __init__(config) : initializes class, takes the yaml config dictionary, and consolidated data dictionary
 #    processConsolidatedData : main driving method, formats the data submits to otx
@@ -224,7 +235,6 @@ class alienvaultOTX:
     consolidatedData = {}
 
     def __init__(self, lookout_config, consolidatedData):
-        print(" -- OTX Submit object created")
         self.lookout_config = lookout_config
         self.consolidatedData = consolidatedData.copy()
 
@@ -234,10 +244,6 @@ class alienvaultOTX:
         self.SubmitOTX_Pulse(results, "HoneyNet")
 
     def processLogs(self, LogData):
-        print(
-            "--==: Number of Unique IPs Submitted to AlienVault:", len(LogData.keys())
-        )
-
         otxEntries = []
         for item in LogData:
             if "dest_port" in LogData[item].keys():
@@ -302,9 +308,9 @@ class alienvaultOTX:
         PulseReference = ""
 
         OTX_KeyList = [self.lookout_config["OTX_Key_dm_lacia"]]
-        print(f"Building OTX package please wait.. ")
+        print(f"[+]: Building OTX package please wait.. ")
         # OTX_KeyList = [self.lookout_config['OTX_Key_dm_lacia']]
-        for otxItem in tqdm(OTX_KeyList):
+        for otxItem in OTX_KeyList:
             otx = OTXv2(otxItem)
             for pulseItem in PulseNamesList:
                 PulseID = self.checkForOTXPulse(pulseItem, otx)
@@ -318,13 +324,17 @@ class alienvaultOTX:
                         tags=["tsec", "tpot19", "honeypot", "la-safe.org"],
                         references=[PulseReference],
                     )
-                    # print ("Response1:", response)
+                    print(
+                        f"    - Submitted: {len(indicatorsArray)} indicators to : {pulseItem}"
+                    )
                 else:
                     # print("pulse1 already there, cant create it")
                     response = otx.add_pulse_indicators(
                         pulse_id=PulseID, new_indicators=indicatorsArray
                     )
-                    # print ("Response2:",response)
+                    print(
+                        f"    - Submitted: {len(indicatorsArray)} indicators to : {pulseItem}"
+                    )
 
     # Check to see if pulse is already there, if its there add to it, if not create one
     # OTX Pulse is the monthly group i submit things into
@@ -381,6 +391,10 @@ if __name__ == "__main__":
     # ------------ Query and Consolidate Data --------------------
     queryObj = queryElasticsearch(lookout_config)
     queryResults = queryObj.relativeTimeQuery("15m")
+
+    # ------------ Submit to OTX ------------
+    otx_obj = alienvaultOTX(lookout_config, queryResults)
+    otx_obj.processConsolidatedData()
 
     script_stop = time.time()
     print("[+] %s seconds of time to run script ---" % (script_stop - script_start))
