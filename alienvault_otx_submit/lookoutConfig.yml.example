@@ -5,3 +5,4 @@ elasticsearch_username: elastic #change this
 elasticsearch_password: elastic #change this
 OTX_Key_dm_lacia: '<put key here'
 whitelist_ips: ["8.8.8.8","8.8.4.4","0.0.0.0","1.1.1.1"] #also add CCU ips and probably honeypot ips
+blacklist_tpot_types: ["P0f","Fatt"] #these provide no value
